@@ -1,0 +1,57 @@
+package com.lcwd.user.serviceImplementation;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.lcwd.user.entity.Rating;
+import com.lcwd.user.entity.UserEntity;
+import com.lcwd.user.exception.ResourceNotFoundException;
+import com.lcwd.user.repository.UserRepository;
+import com.lcwd.user.service.UserService;
+
+@Service
+public class ServiceImplementation implements UserService{
+
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+	
+	@Override
+	public UserEntity saveUser(UserEntity user) {
+		//Generate unique ID
+		String RandomUId = UUID.randomUUID().toString();
+		user.setUserId(RandomUId);
+		return userRepository.save(user); 	
+	}
+
+	@Override
+	public List<UserEntity> getAllUser() {
+		// TODO Auto-generated method stub
+		return userRepository.findAll();
+	}
+
+	@Override
+	public UserEntity getUserById(String Id) {
+		// TODO Auto-generated method stub
+		//Getting user by id
+		UserEntity user = userRepository.findById(Id).orElseThrow(() -> new ResourceNotFoundException("No id - Custom message"+Id));
+		
+		//Getting rating history of the user
+		ArrayList<Rating> ratingOfUser = restTemplate.getForObject("http://localhost:8082/ratings/users/59c596af-30c5-4aa9-9ab3-1e7bc5f4967c", ArrayList.class);
+		UserEntity.setRatings();
+		
+		
+		
+		
+		return user;
+	}
+
+}

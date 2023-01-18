@@ -1,0 +1,5 @@
+package com.lcwd.Hotels.repository;
+
+public interface HotelRepository {
+
+}

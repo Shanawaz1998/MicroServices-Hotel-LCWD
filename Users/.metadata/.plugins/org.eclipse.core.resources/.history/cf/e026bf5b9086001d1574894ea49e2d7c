@@ -1,0 +1,23 @@
+server:
+  port: 8761
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    name: attendance
+    password: root
+    url: jdbc:mysql://localhost:3306/microservices
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true

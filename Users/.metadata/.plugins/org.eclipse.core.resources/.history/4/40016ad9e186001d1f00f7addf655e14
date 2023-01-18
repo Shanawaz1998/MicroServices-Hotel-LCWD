@@ -1,0 +1,79 @@
+package com.lcwd.user.serviceImplementation;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.lcwd.user.entity.Hotel;
+import com.lcwd.user.entity.Rating;
+import com.lcwd.user.entity.UserEntity;
+import com.lcwd.user.exception.ResourceNotFoundException;
+import com.lcwd.user.repository.UserRepository;
+import com.lcwd.user.service.UserService;
+import com.netflix.discovery.converters.Auto;
+
+import external.service.HotelService;
+
+@Service
+public class ServiceImplementation implements UserService{
+
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+	
+	
+	
+	@Override
+	public UserEntity saveUser(UserEntity user) {
+		//Generate unique ID
+		String RandomUId = UUID.randomUUID().toString();
+		user.setUserId(RandomUId);
+		return userRepository.save(user); 	
+	}
+
+	@Override
+	public List<UserEntity> getAllUser() {
+		// TODO Auto-generated method stub
+		return userRepository.findAll();
+	}
+
+	@Override
+	public UserEntity getUserById(String Id) {
+		// TODO Auto-generated method stub
+		//Getting user by id
+		UserEntity user = userRepository.findById(Id).orElseThrow(() -> new ResourceNotFoundException("No id - Custom message"+Id));
+		
+		//Getting rating history of the user
+		Rating [] ratingOfUser = restTemplate.getForObject("http://RATING-SERVICE:8082/ratings/users/"+user.getUserId(), Rating[].class);
+		
+		List<Rating> ratings =	Arrays.stream(ratingOfUser).toList();	//Converting Array to ArrayList
+		
+		List<Rating> ratingList = ratings.stream().map(rating -> 
+		{	
+			//Api call to hotel Service to get the hotel details rated by the user id
+			//http://localhost:8081/hotels/26d1f1ac-fcd6-4240-bfa4-66c58a2420a9
+			//ResponseEntity<Hotel> forEntity = restTemplate.getForEntity("http://HOTEL-SERVICE:8081/hotels/"+rating.getHotelId(), Hotel.class);
+			
+			//The above first line code communicates using rest Templates and the the below first line code is using FEIGN client
+			Hotel hotel = hotelService.getHotelById(rating.getHotelId());			
+			//Set the hotel to rating
+			rating.setHotel(hotel);
+			return rating;	
+		}).collect(Collectors.toList());
+		
+		user.setRatings(ratingList);
+
+		return user;
+	}
+
+}

@@ -1,0 +1,21 @@
+package com.lcwd.Hotels.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lcwd.Hotels.entity.HotelEntity;
+import com.lcwd.Hotels.service.HotelService;
+
+@RestController
+public class HotelController {
+
+	private HotelService hotelService;
+	
+	public ResponseEntity<HotelEntity> addhHotels(@RequestBody HotelEntity hotelEntity)
+	{
+		HotelEntity addedHotels = 	hotelService.saveHotels(hotelEntity);
+		return ResponseEntity<HotelEntity>.ok(addedHotels);
+	}
+	
+}

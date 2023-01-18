@@ -1,0 +1,5 @@
+package external.service;
+
+public class HotelService {
+
+}

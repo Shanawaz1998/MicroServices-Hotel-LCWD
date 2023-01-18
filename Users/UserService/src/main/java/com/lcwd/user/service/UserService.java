@@ -1,0 +1,17 @@
+package com.lcwd.user.service;
+
+
+import java.util.List;
+
+
+import com.lcwd.user.entity.UserEntity;
+
+public interface UserService 
+{
+	UserEntity saveUser(UserEntity user);
+	
+	List<UserEntity> getAllUser();
+	
+	UserEntity getUserById(String Id);
+	
+}
